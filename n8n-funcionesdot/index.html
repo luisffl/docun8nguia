@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentación interactiva de los métodos de transformación de datos de n8n">
+    <meta name="author" content="Desarrollado como documentación n8n">
+    <title>Métodos de Transformación de Datos n8n</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://n8n.io/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="logo">n8n</span> Métodos de Transformación de Datos</h1>
+            <p class="subtitle">Documentación interactiva de funciones integradas</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="category-filter" id="category-filter"><!-- Botones generados dinámicamente --></div>
+
+        <div class="recommended-filter" style="margin: 8px 0;">
+            <label><input type="checkbox" id="recommended-checkbox"> Solo recomendadas</label>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Buscar método...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-pulse"></i>
+            <span>Cargando métodos...</span>
+        </div>
+
+        <section id="methods-container">
+            <!-- Las tarjetas se generarán dinámicamente con JavaScript -->
+        </section>
+
+        <div id="no-results" class="no-results" style="display: none;">
+            <i class="fas fa-search"></i>
+            <p>No se encontraron métodos con esos criterios de búsqueda.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Basado en la documentación oficial de <a href="https://docs.n8n.io/code/builtin/overview/" target="_blank">n8n</a></p>
+            <p class="small">Esta página web muestra la documentación de los métodos de transformación de datos disponibles en n8n.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>n8n - Métodos y Variables</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="n8n">n8n</span> Métodos y Variables</h1>
+            <p>Referencia rápida para desarrolladores</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar método o variable...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="cards-container">
+            <!-- Tarjeta 1 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$json</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Objeto que contiene los datos actuales del flujo para el item en curso. Es equivalente a $input.item.json.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Acceder a un dato llamado "username" del item actual</span>
+{{ <span class="key">$json</span>.<span class="variable">username</span> }}
+<span class="comment">// Resultado: "johndoe"</span>
+
+<span class="comment">// Utilizar datos anidados</span>
+{{ <span class="key">$json</span>.<span class="variable">customer</span>.<span class="variable">address</span>.<span class="variable">street</span> }}
+<span class="comment">// Resultado: "Calle Principal 123"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$now</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve la fecha y hora actual en formato ISO.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener la fecha y hora actual</span>
+{{ <span class="key">$now</span> }}
+<span class="comment">// Resultado: "2023-06-15T14:30:45.123Z"</span>
+
+<span class="comment">// Usado en un campo de texto</span>
+Creado el: {{ <span class="key">$now</span> }} por {{ <span class="key">$json</span>.<span class="variable">username</span> }}
+<span class="comment">// Resultado: "Creado el: 2023-06-15T14:30:45.123Z por johndoe"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$if()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Función que evalúa una condición y devuelve uno de dos valores según sea verdadera o falsa.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Asignar un estado basado en una puntuación</span>
+{{ <span class="key">$if</span>(<span class="key">$json</span>.<span class="variable">score</span> > 70, <span class="string">"aprobado"</span>, <span class="string">"reprobado"</span>) }}
+<span class="comment">// Resultado si score=85: "aprobado"</span>
+<span class="comment">// Resultado si score=65: "reprobado"</span>
+
+<span class="comment">// Calcular un descuento</span>
+{{ <span class="key">$if</span>(<span class="key">$json</span>.<span class="variable">isPremium</span>, <span class="key">$json</span>.<span class="variable">basePrice</span> * 0.8, <span class="key">$json</span>.<span class="variable">basePrice</span>) }}
+<span class="comment">// Resultado si isPremium=true y basePrice=100: 80</span>
+<span class="comment">// Resultado si isPremium=false y basePrice=100: 100</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 4 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$ifEmpty()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve un valor por defecto si el primer argumento está vacío o no definido.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Usar un nombre por defecto si no existe</span>
+{{ <span class="key">$ifEmpty</span>(<span class="key">$json</span>.<span class="variable">username</span>, <span class="string">"Usuario anónimo"</span>) }}
+<span class="comment">// Resultado si username existe: "johndoe"</span>
+<span class="comment">// Resultado si username no existe: "Usuario anónimo"</span>
+
+<span class="comment">// Establecer una URL por defecto</span>
+{{ <span class="key">$ifEmpty</span>(<span class="key">$json</span>.<span class="variable">profile</span>.<span class="variable">avatar</span>, <span class="string">"https://ejemplo.com/default-avatar.png"</span>) }}
+<span class="comment">// Resultado si no hay avatar: "https://ejemplo.com/default-avatar.png"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 5 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$jmespath()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Ejecuta una consulta JMESPath sobre un objeto JSON.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Extraer todos los nombres de usuarios de un array</span>
+{{ <span class="key">$jmespath</span>(<span class="key">$json</span>.<span class="variable">users</span>, <span class="string">"[*].name"</span>) }}
+<span class="comment">// Resultado: ["Ana", "Carlos", "María"]</span>
+
+<span class="comment">// Filtrar elementos según una condición</span>
+{{ <span class="key">$jmespath</span>(<span class="key">$json</span>.<span class="variable">users</span>, <span class="string">"[?status=='active']"</span>) }}
+<span class="comment">// Resultado: [{id: 1, name: "Ana", status: "active"}, ...]</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 6 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$fromAi()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Permite evaluar expresiones o contenidos generados desde un nodo AI Agent.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Generar un resumen de un texto</span>
+{{ <span class="key">$fromAi</span>(<span class="string">"summarize"</span>, <span class="key">$json</span>.<span class="variable">articleText</span>) }}
+<span class="comment">// Resultado: "El artículo analiza el impacto del cambio climático..."</span>
+
+<span class="comment">// Traducir un mensaje</span>
+{{ <span class="key">$fromAi</span>(<span class="string">"translate"</span>, <span class="key">$json</span>.<span class="variable">message</span>, <span class="string">"es"</span>) }}
+<span class="comment">// Resultado si message="Hello world": "Hola mundo"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 7 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$max()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve el valor numérico más alto de una lista.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Encontrar el precio más alto</span>
+{{ <span class="key">$max</span>(<span class="key">$json</span>.<span class="variable">products</span>.<span class="string">*</span>.<span class="variable">price</span>) }}
+<span class="comment">// Resultado con prices=[10, 25, 15]: 25</span>
+
+<span class="comment">// Obtener el valor máximo entre varios números</span>
+{{ <span class="key">$max</span>(<span class="key">$json</span>.<span class="variable">temp1</span>, <span class="key">$json</span>.<span class="variable">temp2</span>, <span class="key">$json</span>.<span class="variable">temp3</span>) }}
+<span class="comment">// Resultado si temp1=22, temp2=18, temp3=24: 24</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 8 -->
+            <div class="card" data-category="function">
+                <div class="card-header">
+                    <h2>$min()</h2>
+                    <span class="badge">Función</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve el valor numérico más bajo de una lista.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Encontrar el precio más bajo</span>
+{{ <span class="key">$min</span>(<span class="key">$json</span>.<span class="variable">products</span>.<span class="string">*</span>.<span class="variable">price</span>) }}
+<span class="comment">// Resultado con prices=[10, 25, 15]: 10</span>
+
+<span class="comment">// Obtener el valor mínimo entre varios números</span>
+{{ <span class="key">$min</span>(<span class="key">$json</span>.<span class="variable">score1</span>, <span class="key">$json</span>.<span class="variable">score2</span>, <span class="key">$json</span>.<span class="variable">score3</span>) }}
+<span class="comment">// Resultado si score1=85, score2=72, score3=93: 72</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 9 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$execution</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Contiene metadatos sobre la ejecución actual del flujo (ej. ID de ejecución, modo, errores, etc).</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener el ID de la ejecución actual</span>
+{{ <span class="key">$execution</span>.<span class="variable">id</span> }}
+<span class="comment">// Resultado: "842fd7b7-9483-4c0e-89d5-9e8913a79ae3"</span>
+
+<span class="comment">// Verificar si hay errores en la ejecución</span>
+{{ <span class="key">$if</span>(<span class="key">$execution</span>.<span class="variable">errors</span>.<span class="variable">length</span> > 0, <span class="string">"Hay errores"</span>, <span class="string">"Sin errores"</span>) }}
+<span class="comment">// Resultado si no hay errores: "Sin errores"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 10 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$itemIndex</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Índice del item actual dentro del lote de items procesados.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Usar el índice como identificador</span>
+ID-{{ <span class="key">$itemIndex</span> }}
+<span class="comment">// Resultado para el primer ítem: "ID-0"</span>
+<span class="comment">// Resultado para el segundo ítem: "ID-1"</span>
+
+<span class="comment">// Determinar si es el primer elemento</span>
+{{ <span class="key">$if</span>(<span class="key">$itemIndex</span> === 0, <span class="string">"Primer elemento"</span>, <span class="string">"No es el primero"</span>) }}
+<span class="comment">// Resultado para el primer ítem: "Primer elemento"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 11 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$input</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Accede a los datos de entrada completos del nodo actual, incluyendo json, binary y metadatos.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Acceder a datos JSON</span>
+{{ <span class="key">$input</span>.<span class="variable">item</span>.<span class="variable">json</span>.<span class="variable">user</span> }}
+<span class="comment">// Resultado: "johndoe"</span>
+
+<span class="comment">// Acceder a datos binarios</span>
+{{ <span class="key">$input</span>.<span class="variable">item</span>.<span class="variable">binary</span>.<span class="variable">image</span>.<span class="variable">mimeType</span> }}
+<span class="comment">// Resultado: "image/jpeg"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 12 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$parameter</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Permite acceder a los valores de los parámetros configurados en el nodo.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener un parámetro llamado "apiKey"</span>
+{{ <span class="key">$parameter</span>.<span class="variable">apiKey</span> }}
+<span class="comment">// Resultado: "a1b2c3d4e5f6g7h8i9j0"</span>
+
+<span class="comment">// Usar un parámetro como parte de una URL</span>
+https://api.example.com/{{ <span class="key">$parameter</span>.<span class="variable">resource</span> }}
+<span class="comment">// Resultado si resource="users": "https://api.example.com/users"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 13 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$prevNode</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Accede al resultado del nodo anterior conectado, útil para obtener datos cruzados.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener datos del primer item del nodo anterior</span>
+{{ <span class="key">$prevNode</span>.<span class="variable">first</span>().<span class="variable">json</span>.<span class="variable">data</span> }}
+<span class="comment">// Resultado: {"id": 123, "name": "Producto A"}</span>
+
+<span class="comment">// Acceder a un campo específico del nodo anterior</span>
+Estado: {{ <span class="key">$prevNode</span>.<span class="variable">first</span>().<span class="variable">json</span>.<span class="variable">status</span> }}
+<span class="comment">// Resultado: "Estado: completado"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 14 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$runIndex</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Índice de ejecución cuando el nodo se ejecuta varias veces (en loops o múltiples entradas).</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Crear un identificador único por ejecución</span>
+batch-{{ <span class="key">$runIndex</span> }}
+<span class="comment">// Resultado en la primera ejecución: "batch-0"</span>
+<span class="comment">// Resultado en la segunda ejecución: "batch-1"</span>
+
+<span class="comment">// Determinar si es la primera ejecución</span>
+{{ <span class="key">$if</span>(<span class="key">$runIndex</span> === 0, <span class="string">"Primera ejecución"</span>, <span class="string">"Ejecución repetida"</span>) }}
+<span class="comment">// Resultado en la primera ejecución: "Primera ejecución"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 15 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$today</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve solo la fecha actual (sin hora) en formato ISO.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener la fecha actual</span>
+{{ <span class="key">$today</span> }}
+<span class="comment">// Resultado: "2023-06-15"</span>
+
+<span class="comment">// Usar en un objeto de registro</span>
+Fecha de sincronización: {{ <span class="key">$today</span> }}
+<span class="comment">// Resultado: "Fecha de sincronización: 2023-06-15"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 16 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$vars</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Permite acceder a variables definidas en el flujo (con set o en ejecución).</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Acceder a una variable global</span>
+{{ <span class="key">$vars</span>.<span class="variable">globalApiToken</span> }}
+<span class="comment">// Resultado: "eyJhbGciOiJIUzI1NiIsInR5..."</span>
+
+<span class="comment">// Usar variables en una URL</span>
+{{ <span class="key">$vars</span>.<span class="variable">serviceEndpoint</span> }}/api/v{{ <span class="key">$vars</span>.<span class="variable">apiVersion</span> }}
+<span class="comment">// Resultado: "https://api.empresa.com/api/v2"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 17 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$workflow</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Información sobre el flujo actual (nombre, ID, etc).</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Obtener el ID del workflow</span>
+{{ <span class="key">$workflow</span>.<span class="variable">id</span> }}
+<span class="comment">// Resultado: "123e4567-e89b-12d3-a456-426614174000"</span>
+
+<span class="comment">// Usar el nombre del workflow en un registro</span>
+Ejecutando workflow: {{ <span class="key">$workflow</span>.<span class="variable">name</span> }}
+<span class="comment">// Resultado: "Ejecutando workflow: Sincronización de Usuarios"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 18 -->
+            <div class="card" data-category="variable">
+                <div class="card-header">
+                    <h2>$nodeVersion</h2>
+                    <span class="badge">Variable</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Versión del nodo actual, útil para condiciones o depuración avanzada.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Comprobar la versión del nodo</span>
+{{ <span class="key">$if</span>(<span class="key">$nodeVersion</span> === <span class="string">"1.5.0"</span>, <span class="string">"Versión actual"</span>, <span class="string">"Versión diferente"</span>) }}
+<span class="comment">// Resultado si nodeVersion="1.5.0": "Versión actual"</span>
+<span class="comment">// Resultado si nodeVersion="1.4.2": "Versión diferente"</span>
+
+<span class="comment">// Incluir la versión en los logs</span>
+Nodo: HTTPRequest, Versión: {{ <span class="key">$nodeVersion</span> }}
+<span class="comment">// Resultado: "Nodo: HTTPRequest, Versión: 1.5.0"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Referencia de métodos y variables de n8n &copy; 2023</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

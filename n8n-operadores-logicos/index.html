@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operadores Lógicos en n8n</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="n8n">n8n</span> Operadores Lógicos</h1>
+            <p>Guía de referencia para expresiones condicionales</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar operador o ejemplo...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <!-- Tarjetas cuadradas de operadores -->
+        <div class="operator-cards">
+            <div class="operator-card">
+                <div class="operator-icon">
+                    <i class="fas fa-ampersand"></i><i class="fas fa-ampersand"></i>
+                </div>
+                <h2>AND</h2>
+                <p>Operador <span class="code-inline">&&</span></p>
+            </div>
+            <div class="operator-card">
+                <div class="operator-icon">
+                    <i class="fas fa-bars"></i><i class="fas fa-bars"></i>
+                </div>
+                <h2>OR</h2>
+                <p>Operador <span class="code-inline">||</span></p>
+            </div>
+            <div class="operator-card">
+                <div class="operator-icon">
+                    <i class="fas fa-exclamation"></i>
+                </div>
+                <h2>NOT</h2>
+                <p>Operador <span class="code-inline">!</span></p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Ejemplos de uso</h2>
+
+        <div class="cards-container">
+            <!-- Ejemplo 1: && (expresión booleana) -->
+            <div class="card" data-category="and" data-type="expresion_booleana">
+                <div class="card-header">
+                    <h2>AND (&&) - Expresión Booleana</h2>
+                    <span class="badge">AND</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve true solo si el usuario tiene email y está activo; ambas condiciones deben cumplirse.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si el usuario tiene email y está activo</span>
+{{ <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">email</span> && <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">activo</span> }}
+<span class="comment">// Resultado: true (si ambas condiciones son verdaderas)</span>
+<span class="comment">// Resultado: false (si alguna condición es falsa)</span>
+
+<span class="comment">// Uso en estructura de control</span>
+{{ <span class="key">$if</span>(<span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">email</span> && <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">activo</span>, <span class="string">"Usuario válido"</span>, <span class="string">"Usuario inválido"</span>) }}
+<span class="comment">// Resultado: "Usuario válido" (si ambas condiciones son verdaderas)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 2: && (función) -->
+            <div class="card" data-category="and" data-type="funcion">
+                <div class="card-header">
+                    <h2>AND (&&) - Función</h2>
+                    <span class="badge">AND</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Evalúa si el campo 'token' existe y no ha expirado; útil para comprobar acceso válido.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si el token existe y no ha expirado</span>
+{{ <span class="key">$json</span>.<span class="variable">token</span> && <span class="key">$json</span>.<span class="variable">fechaExpiracion</span> > <span class="key">$now</span> }}
+<span class="comment">// Resultado: true (si el token existe y la fecha de expiración es posterior a la actual)</span>
+
+<span class="comment">// Validación de acceso combinando múltiples condiciones</span>
+{{ <span class="key">$json</span>.<span class="variable">autenticado</span> && <span class="key">$json</span>.<span class="variable">permisos</span>.<span class="variable">nivel</span> >= 2 && !<span class="key">$json</span>.<span class="variable">bloqueado</span> }}
+<span class="comment">// Resultado: true (si está autenticado, tiene nivel de permisos >= 2 y no está bloqueado)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 3: || (expresión booleana) -->
+            <div class="card" data-category="or" data-type="expresion_booleana">
+                <div class="card-header">
+                    <h2>OR (||) - Expresión Booleana</h2>
+                    <span class="badge">OR</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve true si el usuario ha aceptado términos o si es administrador; se cumple con cualquiera de las dos condiciones.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si el usuario aceptó términos o es administrador</span>
+{{ <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">aceptoTerminos</span> || <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">esAdmin</span> }}
+<span class="comment">// Resultado: true (si cualquiera de las condiciones es verdadera)</span>
+<span class="comment">// Resultado: false (solo si ambas condiciones son falsas)</span>
+
+<span class="comment">// Uso en estructura de control</span>
+{{ <span class="key">$if</span>(<span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">aceptoTerminos</span> || <span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">esAdmin</span>, <span class="string">"Acceso permitido"</span>, <span class="string">"Acceso denegado"</span>) }}
+<span class="comment">// Resultado: "Acceso permitido" (si cualquiera de las condiciones es verdadera)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 4: || (función) -->
+            <div class="card" data-category="or" data-type="funcion">
+                <div class="card-header">
+                    <h2>OR (||) - Función</h2>
+                    <span class="badge">OR</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Evalúa si un campo llamado 'activo' o 'pendiente' está en true; útil cuando cualquiera de los dos estados permite continuar.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si está activo o pendiente</span>
+{{ <span class="key">$json</span>.<span class="variable">estado</span>.<span class="variable">activo</span> || <span class="key">$json</span>.<span class="variable">estado</span>.<span class="variable">pendiente</span> }}
+<span class="comment">// Resultado: true (si cualquiera de los estados es verdadero)</span>
+
+<span class="comment">// Coalesciencia con OR (valor predeterminado)</span>
+{{ <span class="key">$json</span>.<span class="variable">configuracion</span>.<span class="variable">timeout</span> || 30 }}
+<span class="comment">// Resultado: valor de timeout si existe, o 30 como predeterminado</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 5: ! (expresión booleana) -->
+            <div class="card" data-category="not" data-type="expresion_booleana">
+                <div class="card-header">
+                    <h2>NOT (!) - Expresión Booleana</h2>
+                    <span class="badge">NOT</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Devuelve true si el usuario no está autenticado; útil para saber cuándo bloquear o redirigir.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si el usuario NO está autenticado</span>
+{{ !<span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">autenticado</span> }}
+<span class="comment">// Resultado: true (si autenticado es false)</span>
+<span class="comment">// Resultado: false (si autenticado es true)</span>
+
+<span class="comment">// Uso en estructura de control</span>
+{{ <span class="key">$if</span>(!<span class="key">$json</span>.<span class="variable">usuario</span>.<span class="variable">autenticado</span>, <span class="string">"Redirigir a login"</span>, <span class="string">"Continuar"</span>) }}
+<span class="comment">// Resultado: "Redirigir a login" (si no está autenticado)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 6: ! (función) -->
+            <div class="card" data-category="not" data-type="funcion">
+                <div class="card-header">
+                    <h2>NOT (!) - Función</h2>
+                    <span class="badge">NOT</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Evalúa si el campo 'borrado' no está activo (es decir, si el registro sigue válido); útil para filtrar eliminados lógicamente.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Verificar si el registro NO está borrado</span>
+{{ !<span class="key">$json</span>.<span class="variable">registro</span>.<span class="variable">borrado</span> }}
+<span class="comment">// Resultado: true (si borrado es false, indicando que el registro es válido)</span>
+
+<span class="comment">// Filtrado de elementos no válidos</span>
+{{ <span class="key">$json</span>.<span class="variable">items</span>.<span class="variable">filter</span>(item => !item.<span class="variable">borrado</span>) }}
+<span class="comment">// Resultado: Array de items donde borrado=false (registros válidos)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Referencia de operadores lógicos para n8n &copy; 2023</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos DOM
+            const searchInput = document.getElementById('searchInput');
+            const cards = document.querySelectorAll('.card');
+            const copyButtons = document.querySelectorAll('.code-actions i.fa-copy');
+            
+            // Función de filtrado para la búsqueda
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                
+                cards.forEach(card => {
+                    const title = card.querySelector('h2').textContent.toLowerCase();
+                    const description = card.querySelector('.description').textContent.toLowerCase();
+                    const codeExample = card.querySelector('code').textContent.toLowerCase();
+                    
+                    // Verificar si alguno de los campos contiene el término de búsqueda
+                    const matchesSearch = 
+                        title.includes(searchTerm) || 
+                        description.includes(searchTerm) || 
+                        codeExample.includes(searchTerm);
+                    
+                    // Mostrar/ocultar tarjetas según la coincidencia
+                    if (matchesSearch) {
+                        card.style.display = 'block';
+                        // Pequeña animación cuando se encuentra una coincidencia
+                        card.style.animation = 'none';
+                        setTimeout(() => {
+                            card.style.animation = 'fadeIn 0.5s forwards';
+                        }, 10);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Funcionalidad de copiar código
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Encontrar el contenedor de código más cercano
+                    const codeContainer = this.closest('.code-container');
+                    const codeText = codeContainer.querySelector('code').innerText;
+                    
+                    // Copiar al portapapeles
+                    navigator.clipboard.writeText(codeText)
+                        .then(() => {
+                            // Cambiar icono temporalmente para dar feedback
+                            const originalIcon = this.className;
+                            this.className = 'fas fa-check';
+                            this.parentElement.style.color = '#4CAF50';
+                            
+                            // Volver al icono original después de un tiempo
+                            setTimeout(() => {
+                                this.className = originalIcon;
+                                this.parentElement.style.color = '';
+                            }, 1500);
+                        })
+                        .catch(err => {
+                            console.error('Error al copiar el texto: ', err);
+                            this.parentElement.style.color = '#f44336';
+                        });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

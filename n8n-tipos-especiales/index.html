@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos Especiales en JavaScript - n8n</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><span class="n8n">n8n</span> Tipos Especiales en JavaScript</h1>
+            <p>Comportamiento y ejemplos de uso en expresiones n8n</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar tipo especial...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="cards-container">
+            <!-- Tarjeta 1: undefined -->
+            <div class="card" data-category="type">
+                <div class="card-header">
+                    <h2>undefined</h2>
+                    <span class="badge">Tipo Especial</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Representa el valor de una variable que no ha sido asignada o una propiedad que no existe en un objeto. En n8n, ocurre al intentar acceder a propiedades inexistentes en $json.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Acceder a una propiedad que no existe</span>
+{{ <span class="key">$json</span>.<span class="variable">propiedadInexistente</span> }}
+<span class="comment">// Resultado: undefined</span>
+
+<span class="comment">// Comprobar si un valor es undefined</span>
+{{ <span class="key">$json</span>.<span class="variable">propiedadInexistente</span> === undefined }}
+<span class="comment">// Resultado: true</span>
+
+<span class="comment">// Usar operador de coalescencia nula para ofrecer valor alternativo</span>
+{{ <span class="key">$json</span>.<span class="variable">propiedadInexistente</span> ?? <span class="string">"Valor por defecto"</span> }}
+<span class="comment">// Resultado: "Valor por defecto"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2: null -->
+            <div class="card" data-category="type">
+                <div class="card-header">
+                    <h2>null</h2>
+                    <span class="badge">Tipo Especial</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Representa la ausencia intencional de cualquier valor de objeto. A diferencia de undefined, null es un valor asignado deliberadamente para indicar "sin valor".</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Establecer un valor como null</span>
+{{ <span class="key">$json</span>.<span class="variable">datosOpcionales</span> = null }}
+<span class="comment">// Resultado: null</span>
+
+<span class="comment">// Comprobar si un valor es null</span>
+{{ <span class="key">$json</span>.<span class="variable">datosOpcionales</span> === null }}
+<span class="comment">// Resultado: true si datosOpcionales es null</span>
+
+<span class="comment">// null es un objeto en JavaScript (comportamiento peculiar)</span>
+{{ typeof null }}
+<span class="comment">// Resultado: "object"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3: NaN -->
+            <div class="card" data-category="type">
+                <div class="card-header">
+                    <h2>NaN</h2>
+                    <span class="badge">Tipo Especial</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">"Not a Number". Representa el resultado de una operación matemática inválida. Es un valor especial que indica que algo no es un número válido en JavaScript.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// Intentar convertir texto no numérico a número</span>
+{{ <span class="key">Number</span>(<span class="string">"Hola mundo"</span>) }}
+<span class="comment">// Resultado: NaN</span>
+
+<span class="comment">// Operaciones matemáticas con valores no numéricos en funciones n8n</span>
+{{ <span class="key">$max</span>([<span class="string">"A"</span>, <span class="string">"B"</span>, <span class="string">"C"</span>]) }}
+<span class="comment">// Resultado: NaN</span>
+
+<span class="comment">// Comprobar si un valor es NaN</span>
+{{ <span class="key">isNaN</span>(<span class="key">Number</span>(<span class="string">"Hola mundo"</span>)) }}
+<span class="comment">// Resultado: true</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 4: Infinity -->
+            <div class="card" data-category="type">
+                <div class="card-header">
+                    <h2>Infinity</h2>
+                    <span class="badge">Tipo Especial</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Representa un valor infinito positivo. Ocurre cuando una operación matemática supera el valor numérico más grande posible o al dividir por cero.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// División por cero</span>
+{{ 1 / 0 }}
+<span class="comment">// Resultado: Infinity</span>
+
+<span class="comment">// Valor predefinido en JavaScript</span>
+{{ <span class="key">Infinity</span> }}
+<span class="comment">// Resultado: Infinity</span>
+
+<span class="comment">// Usar $min en un array vacío</span>
+{{ <span class="key">$min</span>([]) }}
+<span class="comment">// Resultado: Infinity (comportamiento especial de n8n)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 5: -Infinity -->
+            <div class="card" data-category="type">
+                <div class="card-header">
+                    <h2>-Infinity</h2>
+                    <span class="badge">Tipo Especial</span>
+                </div>
+                <div class="card-body">
+                    <p class="description">Representa un valor infinito negativo. Ocurre cuando una operación matemática supera el valor numérico negativo más grande posible.</p>
+                    <div class="example">
+                        <h3>Ejemplo:</h3>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <div class="code-title">Expression</div>
+                                <div class="code-actions">
+                                    <span><i class="fas fa-copy"></i></span>
+                                </div>
+                            </div>
+                            <pre><code><span class="comment">// División por cero con número negativo</span>
+{{ -1 / 0 }}
+<span class="comment">// Resultado: -Infinity</span>
+
+<span class="comment">// Valor predefinido en JavaScript</span>
+{{ -<span class="key">Infinity</span> }}
+<span class="comment">// Resultado: -Infinity</span>
+
+<span class="comment">// Usar $max en un array vacío</span>
+{{ <span class="key">$max</span>([]) }}
+<span class="comment">// Resultado: -Infinity (comportamiento especial de n8n)</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Referencia de tipos especiales en JavaScript para n8n &copy; 2023</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos DOM
+            const searchInput = document.getElementById('searchInput');
+            const cards = document.querySelectorAll('.card');
+            const copyButtons = document.querySelectorAll('.code-actions i.fa-copy');
+            
+            // Función de filtrado para la búsqueda
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                
+                cards.forEach(card => {
+                    const title = card.querySelector('h2').textContent.toLowerCase();
+                    const description = card.querySelector('.description').textContent.toLowerCase();
+                    const codeExample = card.querySelector('code').textContent.toLowerCase();
+                    
+                    // Verificar si alguno de los campos contiene el término de búsqueda
+                    const matchesSearch = 
+                        title.includes(searchTerm) || 
+                        description.includes(searchTerm) || 
+                        codeExample.includes(searchTerm);
+                    
+                    // Mostrar/ocultar tarjetas según la coincidencia
+                    if (matchesSearch) {
+                        card.style.display = 'block';
+                        // Pequeña animación cuando se encuentra una coincidencia
+                        card.style.animation = 'none';
+                        setTimeout(() => {
+                            card.style.animation = 'fadeIn 0.5s forwards';
+                        }, 10);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Funcionalidad de copiar código
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Encontrar el contenedor de código más cercano
+                    const codeContainer = this.closest('.code-container');
+                    const codeText = codeContainer.querySelector('code').innerText;
+                    
+                    // Copiar al portapapeles
+                    navigator.clipboard.writeText(codeText)
+                        .then(() => {
+                            // Cambiar icono temporalmente para dar feedback
+                            const originalIcon = this.className;
+                            this.className = 'fas fa-check';
+                            this.parentElement.style.color = '#4CAF50';
+                            
+                            // Volver al icono original después de un tiempo
+                            setTimeout(() => {
+                                this.className = originalIcon;
+                                this.parentElement.style.color = '';
+                            }, 1500);
+                        })
+                        .catch(err => {
+                            console.error('Error al copiar el texto: ', err);
+                            this.parentElement.style.color = '#f44336';
+                        });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

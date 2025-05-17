@@ -1,0 +1,64 @@
+{
+  "built_in_methods_and_variables": {
+    "current_node_input": {
+      "$": {
+        "description": "Devuelve los datos de entrada del nodo actual",
+        "supported_in_code_node": true,
+        "example": "$.item.json.data"
+      },
+      "$input": {
+        "description": "Objeto que contiene todos los datos de entrada",
+        "supported_in_code_node": true,
+        "example": "$input.all()"
+      },
+      "$items": {
+        "description": "Array que contiene todos los items de entrada",
+        "supported_in_code_node": true,
+        "example": "$items[0].json.data"
+      }
+    },
+    "workflow": {
+      "$workflow": {
+        "description": "Accede a los datos del workflow actual",
+        "supported_in_code_node": true,
+        "example": "$workflow.id"
+      },
+      "$execution": {
+        "description": "Accede a los datos de la ejecución actual",
+        "supported_in_code_node": true,
+        "example": "$execution.id"
+      }
+    },
+    "binary_data": {
+      "$binary": {
+        "description": "Accede a datos binarios",
+        "supported_in_code_node": true,
+        "example": "$binary.data"
+      }
+    },
+    "environment": {
+      "$env": {
+        "description": "Accede a variables de entorno",
+        "supported_in_code_node": true,
+        "example": "$env.NODE_ENV"
+      }
+    },
+    "utilities": {
+      "$if": {
+        "description": "Evaluación condicional",
+        "supported_in_code_node": true,
+        "example": "$if(condition, trueValue, falseValue)"
+      },
+      "$json": {
+        "description": "Parsea y manipula JSON",
+        "supported_in_code_node": true,
+        "example": "$json(object)"
+      },
+      "$now": {
+        "description": "Obtiene la fecha y hora actual",
+        "supported_in_code_node": true,
+        "example": "$now"
+      }
+    }
+  }
+} 
