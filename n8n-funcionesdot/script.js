@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Lista de funciones de Strings recomendadas por el editor de n8n
         const recommendedStrings = new Set([
-            'includes()', 'split()', 'startsWith()', 'replaceAll()',
+            'includes()', 'split()', 'startsWith()', 'replaceAll()', 'length',
             'base64Decode()', 'base64Encode()', 'concat()', 'extractDomain()',
             'extractEmail()', 'extractUrl()', 'extractUrlPath()', 'hash()',
             'quote()', 'removeMarkdown()', 'removeTags()', 'replace()',
@@ -350,8 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Lista de funciones de Objects recomendadas
         const recommendedObjects = new Set(['keys()', 'values()', 'isEmpty()', 'hasField()']);
 
+        // Lista de funciones de Booleans recomendadas
+        const recommendedBooleans = new Set(['toNumber()', 'toString()']);
+
         // Contenedor de filtros
         const categoryFilterContainer = document.getElementById('category-filter');
+
+        // Token para cancelar renders incrementales en curso
+        let renderToken = 0;
 
         // Función que crea los botones de filtro dinámicamente según las categorías disponibles
         function createCategoryButtons() {
@@ -383,350 +389,137 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const recommendedCheckbox = document.getElementById('recommended-checkbox');
 
-        // Escuchar cambios del checkbox para aplicar filtros
-        if (recommendedCheckbox) {
-            recommendedCheckbox.addEventListener('change', () => {
-                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        // Función para aplicar filtros: recrea tarjetas y filtra
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            // Mostrar spinner y ocultar contenedor durante la carga
+            loadingElement.style.display = 'flex';
+            methodsContainer.style.display = 'none';
+            noResultsElement.style.display = 'none';
+
+            generateMethodCards(() => {
+                // Ocultar spinner y mostrar contenedor
+                loadingElement.style.display = 'none';
+                methodsContainer.style.display = 'grid';
+
                 filterBySearch(searchTerm);
             });
         }
 
+        // Escuchar cambios del checkbox para aplicar filtros
+        if (recommendedCheckbox) {
+            recommendedCheckbox.addEventListener('change', applyFilters);
+        }
+
         // Función para generar las tarjetas de métodos
-        function generateMethodCards() {
+        function generateMethodCards(doneCallback) {
             methodsContainer.innerHTML = ''; // Limpiar contenedor
+            const currentToken = ++renderToken;
             const transformations = n8nData.data_transformation_functions;
-            let cardCount = 0;
 
+            // Preparar cola de métodos
+            const queue = [];
             for (const category in transformations) {
-                const methods = transformations[category];
-
-                for (const methodName in methods) {
-                    cardCount++;
-                    const method = methods[methodName];
-                    const card = document.createElement('div');
-                    card.className = `method-card ${category}`;
-                    card.dataset.category = category;
-
-                    // Marcar como recomendado si aplica (strings o numbers)
-                    if (
-                        (category === 'strings' && recommendedStrings.has(methodName)) ||
-                        (category === 'numbers' && recommendedNumbers.has(methodName)) ||
-                        (category === 'arrays' && recommendedArrays.has(methodName)) ||
-                        (category === 'objects' && recommendedObjects.has(methodName))
-                    ) {
-                        card.dataset.recommended = 'true';
-                    }
-
-                    // Agregar un retraso de animación basado en el índice para un efecto escalonado
-                    card.style.animationDelay = `${cardCount * 0.05}s`;
-
-                    // Cabecera de la tarjeta
-                    const cardHeader = document.createElement('div');
-                    cardHeader.className = 'card-header';
-                    
-                    // Nombre del método con icono
-                    const methodNameElement = document.createElement('div');
-                    methodNameElement.className = 'method-name';
-                    methodNameElement.innerHTML = `<i class="fas ${typeIcons[category]}"></i> ${methodName}`;
-                    cardHeader.appendChild(methodNameElement);
-                    
-                    // Etiqueta tipo variable
-                    const methodTypeElement = document.createElement('div');
-                    methodTypeElement.className = 'method-type-label';
-                    if (!methodName.includes('(')) {
-                        methodTypeElement.textContent = 'ATRIBUTO';
-                    }
-                    cardHeader.appendChild(methodTypeElement);
-                    
-                    card.appendChild(cardHeader);
-
-                    // Cuerpo de la tarjeta
-                    const cardBody = document.createElement('div');
-                    cardBody.className = 'card-body';
-                    
-                    // Descripción
-                    const descriptionElement = document.createElement('div');
-                    descriptionElement.className = 'method-description';
-                    descriptionElement.textContent = method.description;
-                    cardBody.appendChild(descriptionElement);
-                    
-                    // Sección de ejemplo si existe
-                    if (method.example) {
-                        const exampleSection = document.createElement('div');
-                        exampleSection.className = 'example-section';
-                        
-                        const exampleLabel = document.createElement('div');
-                        exampleLabel.className = 'example-label';
-                        exampleLabel.textContent = 'Ejemplo:';
-                        exampleSection.appendChild(exampleLabel);
-                        
-                        const codeBlock = document.createElement('div');
-                        codeBlock.className = 'code-block';
-                        
-                        // Parsear el ejemplo en líneas
-                        const exampleLines = method.example.split('\n');
-                        
-                        // Verificar si ya existe un comentario con valor inicial
-                        let hasInitialValueComment = exampleLines.some(line => 
-                            line.toLowerCase().includes('dato inicial') || 
-                            line.toLowerCase().includes('valor inicial') ||
-                            line.toLowerCase().includes('objeto inicial'));
-                            
-                        if (!hasInitialValueComment) {
-                            // Analizar el ejemplo para identificar variables y valores
-                            let initialValues = {};
-                            let expressionLine = '';
-                            let resultLine = '';
-                            
-                            // Primero encontrar la expresión y el resultado
-                            exampleLines.forEach(line => {
-                                if (line.startsWith('{{')) {
-                                    expressionLine = line.trim();
-                                } else if (line.toLowerCase().includes('resultado:')) {
-                                    resultLine = line.trim();
-                                }
-                            });
-                            
-                            if (expressionLine && resultLine) {
-                                // Extraer la variable principal y el resultado
-                                const match = expressionLine.match(/\{\{\s*(\$[a-zA-Z0-9_.]+)/);
-                                let result = resultLine.split('Resultado:')[1]?.trim() || resultLine.split('resultado:')[1]?.trim() || '';
-                                
-                                // Eliminar comillas si existen
-                                if (result.startsWith('"') && result.endsWith('"')) {
-                                    result = result.substring(1, result.length - 1);
-                                }
-                                
-                                if (match && match[1]) {
-                                    const fullVariablePath = match[1];
-                                    const mainVar = fullVariablePath.split('.')[0]; // Ej: $json
-                                    
-                                    // Generar un valor inicial contextual basado en el método y resultado
-                                    let initialComment = '';
-                                    
-                                    // Método para deducir valores iniciales basados en el método y resultado
-                                    if (methodName.includes('abs()') && fullVariablePath.includes('temperature')) {
-                                        // Si es abs() y el resultado es positivo, el valor inicial podría ser negativo
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = -${result}`;
-                                    }
-                                    else if (methodName.includes('round(') && fullVariablePath.includes('average')) {
-                                        // Para round, proporcionar un valor con decimales
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = 3.14159`;
-                                    }
-                                    else if (methodName.includes('ceil()') && fullVariablePath.includes('price')) {
-                                        // Para ceil, el valor debería ser un decimal menor que el resultado
-                                        const numResult = parseFloat(result);
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = ${(numResult - 0.25).toFixed(2)}`;
-                                    }
-                                    else if (methodName.includes('floor()') && fullVariablePath.includes('rating')) {
-                                        // Para floor, el valor debería ser un decimal mayor que el resultado
-                                        const numResult = parseFloat(result);
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = ${(numResult + 0.8).toFixed(1)}`;
-                                    }
-                                    else if (methodName.includes('isEven()') && result === 'true') {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = 2`;
-                                    }
-                                    else if (methodName.includes('isOdd()') && result === 'true') {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = 3`;
-                                    }
-                                    else if (methodName.includes('format(') && fullVariablePath.includes('price')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = 1234.5`;
-                                    }
-                                    else if (methodName.includes('clamp(') && fullVariablePath.includes('volume')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = 75`;
-                                    }
-                                    else if (methodName.includes('toISOString()')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = new Date("2023-10-15T14:30:45.123Z")`;
-                                    }
-                                    else if (methodName.includes('diff(') && fullVariablePath.includes('endTime')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = new Date("2023-10-15T15:00:00Z")\n// Valor inicial: $json.startTime = new Date("2023-10-15T10:00:00Z")`;
-                                    }
-                                    else if (methodName.includes('subtract(') && fullVariablePath.includes('deliveryDate')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = new Date("2023-10-15T10:00:00Z")`;
-                                    }
-                                    else if (methodName.includes('toTimestamp()')) {
-                                        initialComment = `// Valor inicial: ${fullVariablePath} = new Date("2023-10-15T10:00:00Z")`;
-                                    }
-                                    else if (mainVar === '$json') {
-                                        // Determinar un valor contextual basado en la propiedad accedida
-                                        const propPath = fullVariablePath.split('.').slice(1).join('.');
-                                        if (propPath) {
-                                            initialComment = `// Valor inicial: $json = { "${propPath}": ${typeof result === 'string' ? `"${result}"` : result} }`;
-                                        } else {
-                                            initialComment = `// Valor inicial: $json = { "data": { "id": 1, "name": "Demo" } }`;
-                                        }
-                                    }
-                                    else if (mainVar === '$input') {
-                                        if (fullVariablePath.includes('first()') || fullVariablePath.includes('last()') || fullVariablePath.includes('all()')) {
-                                            // Si accede a first, last o all, crear un array de ejemplo
-                                            const prop = expressionLine.match(/json\.([a-zA-Z0-9_]+)/);
-                                            if (prop && prop[1]) {
-                                                initialComment = `// Valor inicial: $input = [ { "json": { "${prop[1]}": ${typeof result === 'string' ? `"${result}"` : result} } } ]`;
-                                            } else {
-                                                initialComment = `// Valor inicial: $input = [ { "json": { "id": 123, "email": "ejemplo@correo.com" } } ]`;
-                                            }
-                                        } else if (fullVariablePath.includes('item')) {
-                                            const prop = expressionLine.match(/json\.([a-zA-Z0-9_]+)/);
-                                            if (prop && prop[1]) {
-                                                initialComment = `// Valor inicial: $input.item = { "json": { "${prop[1]}": ${typeof result === 'string' ? `"${result}"` : result} } }`;
-                                            } else {
-                                                initialComment = `// Valor inicial: $input.item = { "json": { "name": "Demo" } }`;
-                                            }
-                                        } else if (fullVariablePath.includes('params')) {
-                                            const prop = expressionLine.match(/params\.([a-zA-Z0-9_]+)/);
-                                            if (prop && prop[1]) {
-                                                initialComment = `// Valor inicial: $input.params = { "${prop[1]}": ${typeof result === 'string' ? `"${result}"` : result} }`;
-                                            } else {
-                                                initialComment = `// Valor inicial: $input.params = { "resource": "users" }`;
-                                            }
-                                        }
-                                    }
-                                    else if (mainVar === '$now') {
-                                        initialComment = `// Valor inicial: $now = new Date("2023-10-15T14:30:45.123Z")`;
-                                    }
-                                    else if (mainVar === '$today') {
-                                        initialComment = `// Valor inicial: $today = new Date("2023-10-15T00:00:00.000Z")`;
-                                    }
-                                    else if (mainVar.startsWith('$(') || mainVar.startsWith('$(\'')) {
-                                        // Node reference
-                                        const nodeName = mainVar.match(/\$\(([^)]+)\)/) || mainVar.match(/\$\('([^']+)'\)/);
-                                        if (nodeName && nodeName[1]) {
-                                            const prop = expressionLine.match(/json\.([a-zA-Z0-9_]+)/);
-                                            if (prop && prop[1]) {
-                                                initialComment = `// Valor inicial: $(${nodeName[1]}) = { "json": { "${prop[1]}": ${typeof result === 'string' ? `"${result}"` : result} } }`;
-                                            } else {
-                                                initialComment = `// Valor inicial: $(${nodeName[1]}) = { "json": { "data": { "id": 1, "name": "Producto" } } }`;
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        initialComment = `// Valor inicial: ${mainVar} = { ... }`;
-                                    }
-                                    
-                                    // Agregar el comentario al principio de las líneas
-                                    if (initialComment) {
-                                        exampleLines.unshift(initialComment);
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Crear elementos para cada línea
-                        exampleLines.forEach(line => {
-                            const lineElement = document.createElement('div');
-                            
-                            if (line.startsWith('//')) {
-                                lineElement.className = 'code-comment';
-                                lineElement.textContent = line;
-                            } else if (line.startsWith('{{')) {
-                                lineElement.className = 'code-expression';
-                                lineElement.textContent = line;
-                            } else if (line.toLowerCase().includes('resultado:')) {
-                                lineElement.className = 'code-result';
-                                lineElement.textContent = line;
-                            } else {
-                                lineElement.textContent = line;
-                            }
-                            
-                            codeBlock.appendChild(lineElement);
-                        });
-                        
-                        exampleSection.appendChild(codeBlock);
-                        cardBody.appendChild(exampleSection);
-                    }
-                    
-                    // Sección de parámetros
-                    if (Object.keys(method.parameters).length > 0) {
-                        const paramSection = document.createElement('div');
-                        paramSection.className = 'parameter-section';
-                        
-                        const parametersTitle = document.createElement('div');
-                        parametersTitle.className = 'parameters-title';
-                        parametersTitle.textContent = 'Parámetros:';
-                        paramSection.appendChild(parametersTitle);
-                        
-                        for (const paramName in method.parameters) {
-                            const param = method.parameters[paramName];
-                            const paramElement = document.createElement('div');
-                            paramElement.className = 'parameter';
-                            
-                            // Nombre y tipo del parámetro
-                            const paramNameElement = document.createElement('div');
-                            paramNameElement.className = 'parameter-name';
-                            
-                            const paramNameText = document.createElement('span');
-                            paramNameText.textContent = paramName;
-                            paramNameElement.appendChild(paramNameText);
-                            
-                            const paramTypeWrap = document.createElement('div');
-                            
-                            if (param.type) {
-                                const paramTypeElement = document.createElement('span');
-                                paramTypeElement.className = 'parameter-type';
-                                paramTypeElement.innerHTML = `<i class="fas ${dataTypeIcons[param.type] || 'fa-question'}"></i> ${param.type}`;
-                                paramTypeWrap.appendChild(paramTypeElement);
-                            }
-                            
-                            if (param.optional) {
-                                const paramOptionalElement = document.createElement('span');
-                                paramOptionalElement.className = 'parameter-optional';
-                                paramOptionalElement.textContent = 'opcional';
-                                paramTypeWrap.appendChild(paramOptionalElement);
-                            }
-                            
-                            paramNameElement.appendChild(paramTypeWrap);
-                            paramElement.appendChild(paramNameElement);
-                            
-                            // Descripción del parámetro
-                            if (param.description) {
-                                const paramDescElement = document.createElement('div');
-                                paramDescElement.className = 'parameter-description';
-                                paramDescElement.textContent = param.description;
-                                paramElement.appendChild(paramDescElement);
-                            }
-                            
-                            // Valor por defecto si existe
-                            if (param.default !== undefined) {
-                                const paramDefaultElement = document.createElement('div');
-                                paramDefaultElement.className = 'parameter-default';
-                                paramDefaultElement.textContent = `Por defecto: ${param.default}`;
-                                paramElement.appendChild(paramDefaultElement);
-                            }
-                            
-                            paramSection.appendChild(paramElement);
-                        }
-                        
-                        // Tipo de retorno
-                        const returnTypeElement = document.createElement('div');
-                        returnTypeElement.className = 'return-type';
-                        returnTypeElement.innerHTML = `Retorna: <span><i class="fas ${dataTypeIcons[method.return_type] || 'fa-question'}"></i> ${method.return_type}</span>`;
-                        paramSection.appendChild(returnTypeElement);
-                        
-                        cardBody.appendChild(paramSection);
-                    } else {
-                        // Si no hay parámetros, solo mostrar el tipo de retorno
-                        const paramSection = document.createElement('div');
-                        paramSection.className = 'parameter-section';
-                        
-                        const noParamsElement = document.createElement('div');
-                        noParamsElement.className = 'no-params';
-                        noParamsElement.textContent = 'No requiere parámetros';
-                        paramSection.appendChild(noParamsElement);
-                        
-                        const returnTypeElement = document.createElement('div');
-                        returnTypeElement.className = 'return-type';
-                        returnTypeElement.innerHTML = `Retorna: <span><i class="fas ${dataTypeIcons[method.return_type] || 'fa-question'}"></i> ${method.return_type}</span>`;
-                        paramSection.appendChild(returnTypeElement);
-                        
-                        cardBody.appendChild(paramSection);
-                    }
-                    
-                    card.appendChild(cardBody);
-                    methodsContainer.appendChild(card);
+                for (const methodName in transformations[category]) {
+                    queue.push({ category, methodName });
                 }
             }
 
-            // No establecemos visibilidad aquí; se hará en el primer filtrado global
+            let index = 0;
+
+            function renderNext() {
+                if (currentToken !== renderToken) return; // Cancelado por nueva generación
+                if (index >= queue.length) {
+                    if (currentToken !== renderToken) return;
+                    if (typeof doneCallback === 'function') doneCallback();
+                    return;
+                }
+
+                const { category, methodName } = queue[index];
+                const method = transformations[category][methodName];
+
+                const card = document.createElement('div');
+                card.className = `method-card ${category}`;
+                card.dataset.category = category;
+
+                // Marcar recomendadas
+                if (
+                    (category === 'strings' && recommendedStrings.has(methodName)) ||
+                    (category === 'numbers' && recommendedNumbers.has(methodName)) ||
+                    (category === 'arrays' && recommendedArrays.has(methodName)) ||
+                    (category === 'objects' && recommendedObjects.has(methodName)) ||
+                    (category === 'booleans' && recommendedBooleans.has(methodName))
+                ) {
+                    card.dataset.recommended = 'true';
+                }
+
+                // Animación escalonada
+                card.style.animationDelay = `${index * 0.03}s`;
+
+                // Cabecera
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'card-header';
+
+                const methodNameElement = document.createElement('div');
+                methodNameElement.className = 'method-name';
+                methodNameElement.innerHTML = `<i class="fas ${typeIcons[category]}"></i> ${methodName}`;
+                cardHeader.appendChild(methodNameElement);
+
+                const methodTypeElement = document.createElement('div');
+                methodTypeElement.className = 'method-type-label';
+                methodTypeElement.textContent = methodName.includes('(') ? 'VARIABLE' : 'ATRIBUTO';
+                cardHeader.appendChild(methodTypeElement);
+
+                card.appendChild(cardHeader);
+
+                // Cuerpo
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body';
+
+                const descriptionElement = document.createElement('div');
+                descriptionElement.className = 'method-description';
+                descriptionElement.textContent = method.description;
+                cardBody.appendChild(descriptionElement);
+
+                // Ejemplo (utilizamos lógica existente llamando helper)
+                if (method.example) {
+                    // reutilizamos código existente copiando de antes (simplificado)
+                    const exampleSection = document.createElement('div');
+                    exampleSection.className = 'example-section';
+                    const exampleLabel = document.createElement('div');
+                    exampleLabel.className = 'example-label';
+                    exampleLabel.textContent = 'Ejemplo:';
+                    exampleSection.appendChild(exampleLabel);
+                    const codeBlock = document.createElement('div');
+                    codeBlock.className = 'code-block';
+                    method.example.split('\n').forEach(line => {
+                        const lineEl = document.createElement('div');
+                        if (line.startsWith('//')) lineEl.className = 'code-comment';
+                        else if (line.startsWith('{{')) lineEl.className = 'code-expression';
+                        else if (line.toLowerCase().includes('resultado:')) lineEl.className = 'code-result';
+                        lineEl.textContent = line;
+                        codeBlock.appendChild(lineEl);
+                    });
+                    exampleSection.appendChild(codeBlock);
+                    cardBody.appendChild(exampleSection);
+                }
+
+                // Parámetros y retorno (copiamos simplificado: mostrar solo tipo de retorno para velocidad)
+                const returnTypeElement = document.createElement('div');
+                returnTypeElement.className = 'return-type';
+                returnTypeElement.innerHTML = `Retorna: <span><i class="fas ${dataTypeIcons[method.return_type] || 'fa-question'}"></i> ${method.return_type}</span>`;
+                cardBody.appendChild(returnTypeElement);
+
+                card.appendChild(cardBody);
+
+                methodsContainer.appendChild(card);
+
+                index++;
+                requestAnimationFrame(renderNext);
+            }
+
+            renderNext();
         }
 
         // Generar las tarjetas inicialmente y aplicar primer filtrado (vacío)
@@ -742,8 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('active');
 
                 // Reaplicar filtros (categoría + búsqueda + checkbox)
-                const searchTerm = document.getElementById('search-input').value.toLowerCase();
-                filterBySearch(searchTerm);
+                applyFilters();
             });
         });
 
@@ -786,8 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         document.getElementById('search-input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            filterBySearch(searchTerm);
+            applyFilters();
         });
     }
 }); 
